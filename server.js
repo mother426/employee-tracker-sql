@@ -1,6 +1,7 @@
+// Require inquirer and sql to use this program
 const inquirer = require("inquirer");
 const mysql = require("mysql");
-
+// connection for this program's server
 const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
@@ -8,13 +9,13 @@ const connection = mysql.createConnection({
   password: "",
   database: "employees_DB",
 });
-
+// connect message and start prompt when program is started
 connection.connect((err) => {
   if (err) throw err;
   console.log(`connected as id ${connection.threadId}\n`);
   startPrompt();
 });
-
+// Intitial prompt that will dictate where the program functions flow
 function startPrompt() {
   inquirer
     .prompt({
@@ -71,7 +72,7 @@ function startPrompt() {
           endPrompt();
       }
     });
-}
+};
 
 function addDepartment() {
   inquirer
@@ -86,12 +87,11 @@ function addDepartment() {
         [answer.name],
         function (err, res) {
           if (err) throw err;
-          console.table(res);
           startPrompt();
         }
       );
     });
-}
+};
 
 function addRole() {
   inquirer
@@ -118,12 +118,11 @@ function addRole() {
         [answer.role, answer.salary, answer.id],
         function (err, res) {
           if (err) throw err;
-          console.table(res);
           startPrompt();
         }
       );
     });
-}
+};
 
 function addEmployee() {
   inquirer
@@ -155,12 +154,11 @@ function addEmployee() {
         [answer.firstname, answer.lastname, answer.roleID, answer.managerID],
         function (err, res) {
           if (err) throw err;
-          console.table(res);
           startPrompt();
         }
       );
     });
-}
+};
 
 function updateEmployeeRole() {
   inquirer
@@ -183,12 +181,11 @@ function updateEmployeeRole() {
         [answer.updatedRole, answer.employeeID],
         function (err, res) {
           if (err) throw err;
-          console.table(res);
           startPrompt();
         }
       );
     });
-}
+};
 
 function viewDepartments() {
   connection.query("SELECT * FROM department", function (err, res) {
@@ -196,7 +193,7 @@ function viewDepartments() {
     console.table(res);
     startPrompt();
   });
-}
+};
 
 function viewRoles() {
   connection.query("SELECT * FROM role", function (err, res) {
@@ -204,8 +201,7 @@ function viewRoles() {
     console.table(res);
     startPrompt();
   });
-  // show the result to the user (console.table)
-}
+};
 
 function viewEmployees() {
   connection.query("SELECT * FROM employee", function (err, res) {
@@ -213,8 +209,7 @@ function viewEmployees() {
     console.table(res);
     startPrompt();
   });
-  // show the result to the user (console.table)
-}
+};
 
 function removeRole() {
   connection.query("SELECT * FROM role", (err, items)=>{
@@ -238,7 +233,7 @@ function removeRole() {
         );
       });
   })
-}
+};
 
 function removeDepartment() {
   connection.query("SELECT * FROM department", (err, items)=>{
@@ -262,7 +257,7 @@ function removeDepartment() {
         );
       });
   })
-}
+};
 
 function removeEmployee() {
   connection.query("SELECT * FROM employee", (err, items)=>{
@@ -286,9 +281,9 @@ function removeEmployee() {
         );
       });
   })
-}
+};
 
 function endPrompt() {
   connection.end();
   process.exit();
-}
+};
