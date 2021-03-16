@@ -3,14 +3,8 @@ const mysql = require("mysql");
 
 const connection = mysql.createConnection({
   host: "localhost",
-
-  // Your port; if not 3306
   port: 3306,
-
-  // Your username
   user: "root",
-
-  // Be sure to update with your own MySQL password!
   password: "",
   database: "employees_DB",
 });
@@ -25,18 +19,18 @@ function startPrompt() {
   inquirer
     .prompt({
       type: "list",
-      message: "Select One of the following options",
+      message: "Select One of the following options to get started:",
       choices: [
-        "Add department",
-        "Add role",
-        "Add employee",
+        "View employees",
         "View departments",
         "View roles",
-        "View employees",
-        "Update employee role",
+        "Add employee",
+        "Add role",
+        "Add department",
         "Remove a department",
         "Remove a role",
         "Remove an employee",
+        "Update employee role",
         "Quit",
       ],
       name: "option",
@@ -197,9 +191,7 @@ function updateEmployeeRole() {
 }
 
 function viewDepartments() {
-  // select from the db
-  let query = "SELECT * FROM department";
-  connection.query(query, function (err, res) {
+  connection.query("SELECT * FROM department", function (err, res) {
     if (err) throw err;
     console.table(res);
     startPrompt();
@@ -207,9 +199,7 @@ function viewDepartments() {
 }
 
 function viewRoles() {
-  // select from the db
-  let query = "SELECT * FROM role";
-  connection.query(query, function (err, res) {
+  connection.query("SELECT * FROM role", function (err, res) {
     if (err) throw err;
     console.table(res);
     startPrompt();
@@ -218,9 +208,7 @@ function viewRoles() {
 }
 
 function viewEmployees() {
-  // select from the db
-  let query = "SELECT * FROM employee";
-  connection.query(query, function (err, res) {
+  connection.query("SELECT * FROM employee", function (err, res) {
     if (err) throw err;
     console.table(res);
     startPrompt();
@@ -277,24 +265,27 @@ function removeDepartment() {
 }
 
 function removeEmployee() {
-  inquirer
-    .prompt({
-      type: "input",
-      message: "Last name of the employee you'd like to remove?",
-      name: "lastName",
-    })
-    .then(function (answer) {
-      connection.query(
-        "DELETE FROM employee WHERE ?",
-        {
-          last_name: answer.lastName,
-        },
-        (err, res) => {
-          if (err) throw err;
-          startPrompt();
-        }
-      );
-    });
+  connection.query("SELECT * FROM employee", (err, items)=>{
+    inquirer
+      .prompt({
+        type: "list",
+        message: "Last name of the employee you'd like to remove?",
+        choices: items.map((item)=> item.last_name),
+        name: "lastName",
+      })
+      .then(function (answer) {
+        connection.query(
+          "DELETE FROM employee WHERE ?",
+          {
+            last_name: answer.lastName,
+          },
+          (err, res) => {
+            if (err) throw err;
+            startPrompt();
+          }
+        );
+      });
+  })
 }
 
 function endPrompt() {
