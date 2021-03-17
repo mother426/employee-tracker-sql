@@ -14,7 +14,7 @@ const connection = mysql.createConnection({
 connection.connect((err) => {
   if (err) throw err;
   console.log(`connected as id ${connection.threadId}\n`);
-  console.log("Welcome to the employee tracker :)")
+  console.log("Welcome to the employee tracker :)");
   startPrompt();
 });
 // Intitial prompt that will dictate where the program functions flow
@@ -75,7 +75,7 @@ function startPrompt() {
       }
     });
 }
-
+// functions for program defined below
 function addDepartment() {
   inquirer
     .prompt({
@@ -163,7 +163,6 @@ function addEmployee() {
 }
 
 function updateEmployeeRole() {
-  // query from both employee AND role? or just employee
   connection.query("SELECT * FROM employee", (err, employees) => {
     inquirer
       .prompt({
@@ -174,12 +173,7 @@ function updateEmployeeRole() {
         }),
         name: "employee",
       })
-      // role_id in employee corresponds with id in role table?
-      // update the role_id of chosen employee
-      // should update the employees role in table
       .then(function (employee) {
-        // .then
-        // connection.query to grab titles of roles
         connection.query("SELECT * FROM role", (err, roles) => {
           inquirer
             .prompt({
@@ -190,11 +184,7 @@ function updateEmployeeRole() {
               }),
               name: "roleChoice",
             })
-            // TODO: update the 'role_id' of chosen employee
             .then(function (answer) {
-              // const chosenRole = roles.titleChoice;
-              // const chosenEmployee = employee.id;
-              // console.log(chosenEmployee);
               console.log(Object.values(employee));
               console.log(Object.values(answer));
               connection.query(
