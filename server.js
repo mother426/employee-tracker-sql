@@ -14,6 +14,7 @@ const connection = mysql.createConnection({
 connection.connect((err) => {
   if (err) throw err;
   console.log(`connected as id ${connection.threadId}\n`);
+  console.log("Welcome to the employee tracker :)")
   startPrompt();
 });
 // Intitial prompt that will dictate where the program functions flow
@@ -21,7 +22,7 @@ function startPrompt() {
   inquirer
     .prompt({
       type: "list",
-      message: "Select One of the following options to get started:",
+      message: "Select one of the following options to get started:",
       choices: [
         "View employees",
         "View departments",
@@ -73,7 +74,7 @@ function startPrompt() {
           endPrompt();
       }
     });
-};
+}
 
 function addDepartment() {
   inquirer
@@ -92,7 +93,7 @@ function addDepartment() {
         }
       );
     });
-};
+}
 
 function addRole() {
   inquirer
@@ -123,7 +124,7 @@ function addRole() {
         }
       );
     });
-};
+}
 
 function addEmployee() {
   inquirer
@@ -159,17 +160,17 @@ function addEmployee() {
         }
       );
     });
-};
+}
 
 function updateEmployeeRole() {
   // query from both employee AND role? or just employee
-  connection.query("SELECT * FROM employee", (err, employees)=>{
+  connection.query("SELECT * FROM employee", (err, employees) => {
     inquirer
       .prompt({
         type: "list",
         message: "Which employee would you like to update?",
-        choices: employees.map((item)=> {
-          return {name: item.last_name, value:item.role_id  }
+        choices: employees.map((item) => {
+          return { name: item.last_name, value: item.role_id };
         }),
         name: "employee",
       })
@@ -179,35 +180,36 @@ function updateEmployeeRole() {
       .then(function (employee) {
         // .then
         // connection.query to grab titles of roles
-        connection.query("SELECT * FROM role", (err, roles)=>{
-          inquirer.prompt({
-            type: "list",
-            message: "What role would you like to assign to this employee?",
-            choices: roles.map((item)=>{
-              return {name: item.title, value: item.id}
-            }),
-            name:"roleChoice"
-          })
-          // TODO: update the 'role_id' of chosen employee 
-          .then(function(answer){
-            // const chosenRole = roles.titleChoice;
-            // const chosenEmployee = employee.id;
-            // console.log(chosenEmployee);
-            console.log(Object.values(employee));
-            console.log(Object.values(answer));
-            connection.query(`UPDATE employee SET role_id = ? WHERE role_id = ?`,
-            [ Object.values(answer),
-              Object.values(employee) ],
-              (err, res) => {
-                if (err) throw err;
-                startPrompt();
-              }
-            );
-          })
-        }) 
+        connection.query("SELECT * FROM role", (err, roles) => {
+          inquirer
+            .prompt({
+              type: "list",
+              message: "What role would you like to assign to this employee?",
+              choices: roles.map((item) => {
+                return { name: item.title, value: item.id };
+              }),
+              name: "roleChoice",
+            })
+            // TODO: update the 'role_id' of chosen employee
+            .then(function (answer) {
+              // const chosenRole = roles.titleChoice;
+              // const chosenEmployee = employee.id;
+              // console.log(chosenEmployee);
+              console.log(Object.values(employee));
+              console.log(Object.values(answer));
+              connection.query(
+                `UPDATE employee SET role_id = ? WHERE role_id = ?`,
+                [Object.values(answer), Object.values(employee)],
+                (err, res) => {
+                  if (err) throw err;
+                  startPrompt();
+                }
+              );
+            });
+        });
       });
-  })
-};
+  });
+}
 
 function viewDepartments() {
   connection.query("SELECT * FROM department", function (err, res) {
@@ -215,7 +217,7 @@ function viewDepartments() {
     console.table(res);
     startPrompt();
   });
-};
+}
 
 function viewRoles() {
   connection.query("SELECT * FROM role", function (err, res) {
@@ -223,7 +225,7 @@ function viewRoles() {
     console.table(res);
     startPrompt();
   });
-};
+}
 
 function viewEmployees() {
   connection.query("SELECT * FROM employee", function (err, res) {
@@ -231,15 +233,15 @@ function viewEmployees() {
     console.table(res);
     startPrompt();
   });
-};
+}
 
 function removeRole() {
-  connection.query("SELECT * FROM role", (err, items)=>{
+  connection.query("SELECT * FROM role", (err, items) => {
     inquirer
       .prompt({
         type: "list",
         message: "Which role would you like to remove?",
-        choices: items.map((item)=> item.title),
+        choices: items.map((item) => item.title),
         name: "name",
       })
       .then(function (answer) {
@@ -254,16 +256,16 @@ function removeRole() {
           }
         );
       });
-  })
-};
+  });
+}
 
 function removeDepartment() {
-  connection.query("SELECT * FROM department", (err, items)=>{
+  connection.query("SELECT * FROM department", (err, items) => {
     inquirer
       .prompt({
         type: "list",
         message: "Which role would you like to remove?",
-        choices: items.map((item)=> item.name),
+        choices: items.map((item) => item.name),
         name: "department",
       })
       .then(function (answer) {
@@ -278,16 +280,16 @@ function removeDepartment() {
           }
         );
       });
-  })
-};
+  });
+}
 
 function removeEmployee() {
-  connection.query("SELECT * FROM employee", (err, items)=>{
+  connection.query("SELECT * FROM employee", (err, items) => {
     inquirer
       .prompt({
         type: "list",
         message: "Last name of the employee you'd like to remove?",
-        choices: items.map((item)=> item.last_name),
+        choices: items.map((item) => item.last_name),
         name: "lastName",
       })
       .then(function (answer) {
@@ -302,10 +304,10 @@ function removeEmployee() {
           }
         );
       });
-  })
-};
+  });
+}
 
 function endPrompt() {
   connection.end();
   process.exit();
-};
+}
