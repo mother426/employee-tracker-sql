@@ -1,6 +1,7 @@
 // Require inquirer and sql to use this program
 const inquirer = require("inquirer");
 const mysql = require("mysql");
+
 // connection for this program's server
 const connection = mysql.createConnection({
   host: "localhost",
@@ -161,30 +162,51 @@ function addEmployee() {
 };
 
 function updateEmployeeRole() {
-  inquirer
-    .prompt([
-      {
-        type: "input",
-        message: "Which employee would you like to update (enter employee ID)?",
-        name: "employeeID",
-      },
-
-      {
-        type: "input",
-        message: "What role would you like to assign to this employee?",
-        name: "updatedRole",
-      },
-    ])
-    .then(function (answer) {
-      connection.query(
-        "UPDATE employee SET role_id = ? WHERE last_name = ?",
-        [answer.updatedRole, answer.employeeID],
-        function (err, res) {
-          if (err) throw err;
-          startPrompt();
-        }
-      );
-    });
+  // query from both employee AND role? or just employee
+  connection.query("SELECT * FROM employee", (err, employees)=>{
+    inquirer
+      .prompt({
+        type: "list",
+        message: "Which employee would you like to update?",
+        choices: employees.map((item)=> {
+          return {name: item.last_name, value:item.role_id  }
+        }),
+        name: "employee",
+      })
+      // role_id in employee corresponds with id in role table?
+      // update the role_id of chosen employee
+      // should update the employees role in table
+      .then(function (employee) {
+        // .then
+        // connection.query to grab titles of roles
+        connection.query("SELECT * FROM role", (err, roles)=>{
+          inquirer.prompt({
+            type: "list",
+            message: "What role would you like to assign to this employee?",
+            choices: roles.map((item)=>{
+              return {name: item.title, value: item.id}
+            }),
+            name:"roleChoice"
+          })
+          // TODO: update the 'role_id' of chosen employee 
+          .then(function(answer){
+            // const chosenRole = roles.titleChoice;
+            // const chosenEmployee = employee.id;
+            // console.log(chosenEmployee);
+            console.log(Object.values(employee));
+            console.log(Object.values(answer));
+            connection.query(`UPDATE employee SET role_id = ? WHERE role_id = ?`,
+            [ Object.values(answer),
+              Object.values(employee) ],
+              (err, res) => {
+                if (err) throw err;
+                startPrompt();
+              }
+            );
+          })
+        }) 
+      });
+  })
 };
 
 function viewDepartments() {
